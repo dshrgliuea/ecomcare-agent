@@ -1,0 +1,33 @@
+
+# 环境变量和密钥
+.env
+.env.*
+!.env.example
+
+# Python 虚拟环境
+.venv/
+venv/
+env/
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 本地数据库
+orders.db
+*.sqlite
+*.sqlite3
+
+# Chroma 向量数据库
+chroma_db/
+
+# 编辑器和系统文件
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 日志和临时文件
+*.log
+*.tmp
