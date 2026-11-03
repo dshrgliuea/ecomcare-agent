@@ -1,72 +1,102 @@
-# EcomCare Agent — 电商智能客服 Agent
+# 🛍️ E-Commerce Care Agent｜电商智能客服 Agent
 
-An AI-powered e-commerce customer service agent built with LangGraph, RAG, and Streamlit.
+基于 **通义千问（Qwen）+ LangGraph + Chroma + SQLite + Streamlit** 构建的电商智能客服 Agent 原型。
 
-一个基于大语言模型、LangGraph 和 RAG 的电商智能客服 Agent 原型，支持订单查询、售后政策检索和多轮对话。
+项目模拟电商平台售前售后客服场景，支持自然语言对话、订单信息查询、售后政策知识检索，并通过 Agent 工具调用完成问题处理。
 
-## 项目介绍
+> 本项目为个人独立开发的学习与演示项目，使用模拟订单数据，不连接真实电商平台。
 
-EcomCare Agent 是一个面向电商售后场景的智能客服原型项目。
+---
 
-项目通过大语言模型理解用户问题，并结合 LangGraph、SQLite 订单查询工具和 Chroma 向量知识库，为用户提供订单信息查询及售后政策解答。
+## 一、项目介绍
 
-本项目以个人独立开发的方式完成，使用模拟订单数据和本地知识库进行功能演示，不连接真实电商平台。
+传统客服系统通常依赖固定关键词和预设规则，面对复杂问题时灵活性不足。
 
-## 核心功能
+本项目尝试使用大语言模型与 Agent 工作流，让智能客服能够理解用户意图，并根据问题选择合适的工具：
 
-- **智能对话**：基于大语言模型理解用户问题并生成自然语言回复。
-- **订单查询**：通过 SQLite 查询订单状态、商品信息、物流公司、物流单号和退款状态。
-- **知识库检索（RAG）**：使用 Chroma 向量数据库检索售后政策知识。
-- **Agent 工具调用**：通过 LangGraph 组织 Agent 工作流程，调用订单查询和知识检索工具。
-- **多轮对话**：支持结合前文订单信息继续回答相关问题。
-- **隐私保护**：订单查询工具仅返回业务所需字段，避免向 Agent 暴露不必要的个人信息。
-- **业务边界控制**：不编造订单状态、物流轨迹、退款进度或售后政策。
+- 用户询问订单状态时，调用订单查询工具。
+- 用户询问退货、退款、换货等政策时，调用知识库检索工具。
+- 用户同时询问订单和售后问题时，结合订单数据与政策知识生成回答。
+- 对于知识库中没有明确说明的政策，不随意承诺处理结果。
 
-## 技术栈
+项目重点是实践 **LLM、Agent 工具调用、RAG 知识检索和多轮对话** 的完整开发流程。
+
+## 二、核心功能
+
+| 功能模块 | 功能说明 |
+|---|---|
+| 智能客服对话 | 使用通义千问理解用户自然语言问题 |
+| Agent 工具调用 | 使用 LangGraph Agent 调用不同业务工具 |
+| 订单查询 | 查询模拟订单状态、商品和物流信息 |
+| 售后知识检索 | 使用 Chroma 检索售后政策知识片段 |
+| RAG 问答 | 结合检索结果生成售后政策回答 |
+| 多轮对话 | 在 Streamlit 界面中进行连续对话 |
+| 安全回答 | 对未确认的政策和处理结果保持谨慎，不随意承诺 |
+
+## 三、技术栈
 
 | 技术 | 用途 |
 |---|---|
 | Python | 后端开发语言 |
-| Streamlit | 聊天交互界面 |
-| LangGraph | Agent 工作流程与工具调用 |
-| Alibaba Cloud Bailian / Qwen | 大语言模型服务 |
-| OpenAI-compatible API | 模型接口调用 |
-| Chroma | 向量数据库 |
+| Streamlit | Web 聊天交互界面 |
+| Alibaba Cloud Bailian | 大语言模型与 Embedding 服务 |
+| Qwen-plus | 客服对话模型 |
+| LangGraph / LangChain | Agent 工作流与工具调用 |
+| ChromaDB | 向量数据库 |
+| text-embedding-v3 | 文本向量化 |
 | SQLite | 模拟订单数据存储 |
-| RAG | 售后知识检索增强生成 |
+| python-dotenv | 环境变量管理 |
 
-## 项目结构
+## 四、系统架构
+
+```mermaid
+flowchart TD
+    A[用户] --> B[Streamlit 聊天界面]
+    B --> C[LangGraph Agent]
+    C --> D{选择业务工具}
+    D --> E[订单查询工具]
+    D --> F[售后知识检索工具]
+    E --> G[SQLite 订单数据库]
+    F --> H[Chroma 向量数据库]
+    H --> I[售后政策知识片段]
+    G --> J[工具执行结果]
+    I --> J
+    J --> K[Qwen-plus 生成回答]
+    K --> B
+```
+
+## 五、项目目录
 
 ```text
 ecomcare-agent/
 │
-├── app.py                 # Streamlit 聊天应用入口
-├── agent_graph.py         # LangGraph Agent 核心逻辑
-├── order_tools.py         # SQLite 订单查询工具
-├── vector_tools.py        # Chroma 知识检索工具
-├── knowledge_tools.py     # 知识库相关工具
-├── build_vector_db.py     # 构建 Chroma 向量数据库
-├── init_db.py             # 初始化订单数据库
+├── app.py                  # Streamlit 聊天应用入口
+├── agent_graph.py          # LangGraph Agent 核心逻辑
+├── order_tools.py          # 订单查询工具
+├── vector_tools.py         # Chroma 知识检索工具
+├── build_vector_db.py      # 构建向量知识库
+├── test_knowledge.py       # 知识库检索测试
 │
-├── knowledge/
-│   └── after_sales.txt    # 售后政策知识文档
+├── knowledge/              # 售后政策知识文件
+│   ├── after_sales.txt
+│   ├── return_policy.txt
+│   ├── refund_policy.txt
+│   ├── exchange_policy.txt
+│   ├── quality_policy.txt
+│   ├── shipping_policy.txt
+│   └── human_service.txt
 │
-├── .env.example           # 环境变量配置示例
-├── .gitignore             # Git 忽略规则
-└── README.md              # 项目说明文档
+├── chroma_db/              # 本地生成的向量数据库
+├── orders.db               # 本地模拟订单数据库
+├── .env                    # 本地环境变量，不提交到 GitHub
+├── .env.example            # 环境变量配置示例
+├── .gitignore
+└── README.md
 ```
 
-本地运行时还会生成 `orders.db` 和 `chroma_db/` 等数据文件，这些文件不需要提交到 GitHub。
+说明：`chroma_db/` 和 `orders.db` 为本地运行数据，按项目配置不需要提交到 GitHub。首次运行时需要根据项目脚本生成或初始化相应数据。
 
-## 环境要求
-
-- Windows 10 / 11
-- Python 3.13
-- VS Code
-- Git
-- 阿里云百炼 API Key
-
-## 安装与运行
+## 六、本地运行
 
 ### 1. 克隆项目
 
@@ -75,115 +105,121 @@ git clone https://github.com/dshrgliuea/ecomcare-agent.git
 cd ecomcare-agent
 ```
 
-### 2. 创建 Python 虚拟环境
+### 2. 创建虚拟环境
 
-```powershell
+```bash
 python -m venv .venv
 ```
 
-### 3. 激活虚拟环境
+Windows PowerShell：
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-如果 PowerShell 阻止脚本运行，可以使用虚拟环境中的 Python 直接执行后续命令。
+### 3. 安装依赖
 
-### 4. 安装依赖
+如果项目中提供了 `requirements.txt`：
 
-```powershell
-python -m pip install streamlit python-dotenv openai langgraph langchain-openai chromadb
+```bash
+pip install -r requirements.txt
 ```
 
-如果项目代码使用了其他依赖，请根据实际报错补充安装。
+如果尚未提供依赖清单，需要根据项目实际导入的模块整理并安装依赖。
 
-### 5. 配置环境变量
+### 4. 配置环境变量
 
-复制 `.env.example`，创建项目根目录下的 `.env` 文件。
+在项目根目录创建 `.env` 文件，配置百炼 API：
 
-填写自己的阿里云百炼配置：
-
-```dotenv
-DASHSCOPE_API_KEY=your_api_key_here
+```env
+DASHSCOPE_API_KEY=替换为你自己的API_KEY
 DASHSCOPE_MODEL=qwen-plus
 DASHSCOPE_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
 ```
 
-注意：
+请使用自己的百炼 API Key。不要将真实密钥提交到 GitHub。
 
-- 将 `your_api_key_here` 替换为自己的 API Key。
-- 不要将真实 `.env` 文件或 API Key 上传到 GitHub。
-- `.env.example` 仅用于展示配置格式。
-
-### 6. 初始化订单数据库
+### 5. 构建向量知识库
 
 ```powershell
-python init_db.py
+.\.venv\Scripts\python.exe build_vector_db.py
 ```
 
-### 7. 构建向量知识库
+等待脚本完成知识片段读取、向量化和 Chroma 写入。
+
+### 6. 启动应用
 
 ```powershell
-python build_vector_db.py
+.\.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-### 8. 启动项目
+浏览器打开：
 
-```powershell
-python -m streamlit run app.py
+```text
+http://localhost:8501
 ```
 
-启动后，根据终端显示的本地地址，在浏览器中打开聊天界面。
+## 七、演示场景
 
-## 功能演示
+项目内置模拟订单，可用于测试客服对话。
 
-项目使用模拟订单数据进行测试，例如：
-
-| 订单号 | 商品 | 订单状态 |
+| 订单编号 | 模拟状态 | 商品 |
 |---|---|---|
-| 10001 | 蓝色牛仔裤 | 已发货 |
-| 10002 | 白色运动鞋 | 待发货 |
-| 10003 | 演示商品 | 已签收 |
+| 10001 | 已发货 | 蓝色牛仔裤 |
+| 10002 | 待发货 | 演示订单商品 |
+| 10003 | 已签收 | 演示订单商品 |
 
 可以尝试以下问题：
 
 **订单查询**
-- 查询订单 10001。
-- 订单 10001 使用什么物流？
-- 这个订单现在是什么状态？
+- 帮我查询订单 10001 的物流状态。
+- 我的订单什么时候发货？
 
 **售后政策**
 - 买了五天的衣服可以退货吗？
-- 质量问题退货由谁承担运费？
-- 申请退款后多久到账？
+- 商品有质量问题应该怎么办？
+- 不喜欢商品可以申请退货吗？
 
-**异常与边界测试**
-- 查询订单 99999。
-- 告诉我订单 10001 的客户姓名。
-- 订单还没发货，可以申请七天无理由退货吗？
+**组合问题**
+- 我的牛仔裤已经发货了，如果收到后发现有破损怎么办？
+- 不方便寄回商品，可以直接退款吗？
 
-## 当前项目限制
+## 八、项目亮点
 
-本项目目前是用于学习和功能演示的原型，存在以下限制：
+1. **Agent 工具调用**：通过 Agent 将自然语言问题与订单查询、知识检索工具连接起来。
+2. **RAG 知识库**：将售后政策拆分为知识片段，通过向量检索获取相关内容。
+3. **业务数据与知识分离**：订单状态来自 SQLite，政策信息来自知识库，减少模型凭空编造业务事实的风险。
+4. **谨慎的客服回答策略**：对于尚未确认的退款、运费和人工服务政策，不直接承诺结果。
+5. **可扩展的项目结构**：后续可以继续扩展工单系统、用户权限、真实订单 API 和部署能力。
 
-- 订单数据为本地 SQLite 模拟数据。
-- 尚未接入真实电商平台订单系统。
-- 尚未接入物流公司的实时轨迹 API。
-- 尚不能实际提交退款、退货或售后申请。
-- 知识库内容为项目内的演示售后政策。
-- 尚未实现完整的用户身份认证、角色权限和生产级安全体系。
+## 九、当前项目边界
 
-## 后续优化方向
+当前版本是一个可运行的个人开发原型：
 
-- 接入真实电商平台订单 API。
-- 接入物流实时查询接口。
-- 增加售后工单创建与管理功能。
-- 增加用户身份认证和权限管理。
-- 增加自动化测试、日志和监控。
-- 完善部署流程，支持生产环境运行。
+- 订单数据为本地模拟数据。
+- 售后政策为演示知识库内容。
+- 不连接真实电商平台或物流平台。
+- 不执行真实退款、退货或换货操作。
+- 不包含生产环境所需的完整用户认证、权限管理和监控体系。
+- 线上部署尚未纳入当前版本。
 
-## 项目说明
+## 十、后续优化方向
 
-本项目为个人学习与技术实践项目，重点探索大语言模型、Agent 工作流、工具调用和 RAG 在电商智能客服场景中的应用。
+- 接入真实电商订单 API。
+- 增加 SQLite 工单创建与管理。
+- 增加用户身份认证和角色权限。
+- 优化 Agent 意图识别与工具调用策略。
+- 增加自动化测试和异常监控。
+- 部署到云服务器，实现公网访问。
 
-GitHub: https://github.com/dshrgliuea/ecomcare-agent
+## 十一、项目地址
+
+GitHub：
+
+https://github.com/dshrgliuea/ecomcare-agent
+
+## 十二、开发总结
+
+本项目从零搭建了一个电商智能客服 Agent 原型，实践了 Python 项目结构设计、LLM API 接入、LangGraph Agent、工具调用、RAG 知识检索、SQLite 数据查询以及 Streamlit Web 应用开发。
+
+通过该项目，完成了从基础 AI 对话到具备业务工具调用能力的智能客服原型的开发实践。
